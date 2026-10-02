@@ -35,6 +35,12 @@ Phần còn lại tự thích nghi theo repo:
 Khuôn message mặc định: `Type(scope): <gitmoji> Subject` · body ≥ 3 dòng giải thích VÌ SAO ·
 footer `Refs: <MÃ-JIRA>-<số>`.
 
+## Tự nhận diện
+
+`targets.detect` khai `{ "path": ".git" }`: repo git nào cũng khớp, nên bow-agent tự tick bộ này cho
+mọi dự án chưa khai công nghệ — quy ước commit không phụ thuộc repo viết bằng gì. Không muốn thì bỏ
+tick ở ô Công nghệ (mục "Dùng chung mọi công nghệ").
+
 ## Đăng ký vào bow-agent
 
 Bộ ghép **không** nằm trong `stacks` (không hiện ở dropdown chọn công nghệ). Khai ở `addons`
@@ -43,7 +49,7 @@ của `~/.bow-agent/registry.json`, rồi thêm `with` vào stack nào cần:
 ```json
 {
   "addons": [
-    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.0.0" }
+    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.1.0" }
   ],
   "stacks": [
     { "id": "flutter-api", "label": "Flutter + API", "repo": "github.com/Bow-T/bow-skill-flutter-api", "ref": "v1.0.0", "with": ["commit"] }

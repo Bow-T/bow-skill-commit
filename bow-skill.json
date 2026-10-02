@@ -2,10 +2,15 @@
   "$schema": "https://raw.githubusercontent.com/Bow-T/bow-agent/main/schema/bow-skill.schema.json",
   "id": "commit",
   "label": "Commit chuẩn Bow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Bộ GHÉP dùng chung cho mọi stack: quy ước commit / nhánh / push của team Bow — cấm trailer ghi công AI, Conventional Commit + gitmoji + Refs Jira, đặt tên nhánh, chạy cổng kiểm của chính repo trước khi commit. Không phải stack: stack kéo vào bằng `with: [\"commit\"]` trong registry của bow-agent.",
   "maintainer": "bow-agent",
   "skillsDir": "skills",
+  "targets": {
+    "detect": [
+      { "path": ".git" }
+    ]
+  },
   "skills": [
     "bow-commit"
   ]
