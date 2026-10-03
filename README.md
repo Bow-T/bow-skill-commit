@@ -27,13 +27,17 @@ Phần còn lại tự thích nghi theo repo:
 
 | Repo có gì | Skill làm gì |
 | --- | --- |
-| script cổng `scripts/*-commit.sh` đã commit ở gốc repo (tên do repo đặt: `bow-commit.sh`, `octopus-commit.sh`…) | mở ra xem nó chỉ KIỂM (không tự `git add` / `commit` / `push`) rồi chạy từ gốc repo làm cổng chặn (safety scan + analyzer + checklist) |
+| script cổng `scripts/*-commit.sh` đã commit ở gốc repo (tên do repo đặt) | mở ra xem nó chỉ KIỂM (không tự `git add` / `commit` / `push`) rồi chạy từ gốc repo làm cổng chặn (safety scan + analyzer + checklist) |
 | không có script | tự soát diff đã stage (secret, CORS wildcard, đồ debug sót) rồi chạy check của chính repo: `flutter analyze` / `typecheck` · `lint` · `test` của `package.json` |
 | `scripts/quest-checklist.sh` | bắt buộc tự chấm rubric trước khi push |
 | quy ước commit riêng (CLAUDE.md / CONTRIBUTING) | theo quy ước của repo; ba luật cứng vẫn giữ |
 
 Khuôn message mặc định: `Type(scope): <gitmoji> Subject` · body ≥ 3 dòng giải thích VÌ SAO ·
 footer `Refs: <MÃ-JIRA>-<số>`.
+
+**Dự án được nhận bằng MÃ JIRA** (`ABC` trong `ABC-123`), không bằng tên sản phẩm hay tên repo: skill
+tự dò mã từ tên nhánh, không có thì lấy tiền tố xuất hiện nhiều nhất trong 20 commit gần nhất, cuối
+cùng mới hỏi. Skill không gắn cứng tên dự án nào.
 
 ## Tự nhận diện
 

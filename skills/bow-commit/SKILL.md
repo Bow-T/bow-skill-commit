@@ -1,6 +1,6 @@
 ---
 name: bow-commit
-description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (capitalised Type, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "<project> commit" (e.g. "octopus commit"), "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
+description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (capitalised Type, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "<PROJECT_KEY> commit" (the repo's Jira key, e.g. "ABC commit"), "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
 ---
 
 # Bow Mode — Commit & Push
@@ -11,10 +11,12 @@ and STOP on any failure (fix, then resume).
 Steps marked *if the repo has it* are skipped when the file is not there — never invent
 a script or a command the repo does not ship.
 
-`<PROJECT_KEY>` is the repo's Jira project key (`ABC` in `ABC-123`). Take it from the
-current branch name, else from recent history, else ask the user:
+`<PROJECT_KEY>` is the repo's Jira project key (`ABC` in `ABC-123`). The key is what
+identifies the project here — branch names, the `Refs:` footer and your report all go by
+it, never by a product or repo name. Take it from the current branch name, else from
+recent history (the most frequent prefix is the key), else ask the user:
 ```bash
-git log -20 --format='%s %b' | grep -oE '\b[A-Z][A-Z0-9]+-[0-9]+' | sort | uniq -c | sort -rn | head -3
+git log -20 --format='%s %b' | grep -oE '\b[A-Z][A-Z0-9]+-[0-9]+' | cut -d- -f1 | sort | uniq -c | sort -rn | head -3
 ```
 A repo with no Jira project at all: confirm with the user once, then drop the ticket
 segment from the branch name and the `Refs:` footer — everything else still applies.
@@ -47,8 +49,8 @@ If the repo documents its own message format (CLAUDE.md, CONTRIBUTING.md,
 
 ## 1. Project gate — BLOCKING
 The gate is the repo's own pre-commit script. Its name is the repo's choice
-(`scripts/bow-commit.sh`, `scripts/octopus-commit.sh`, …), so look for it instead of
-assuming the name. This lists it from the repo ROOT, whatever sub-directory you are in:
+(`scripts/<anything>-commit.sh`), so look for it instead of assuming the name. This
+lists it from the repo ROOT, whatever sub-directory you are in:
 ```bash
 git ls-files --full-name ':(top,glob)scripts/*-commit.sh'
 ```
