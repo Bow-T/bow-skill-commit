@@ -27,7 +27,7 @@ Phần còn lại tự thích nghi theo repo:
 
 | Repo có gì | Skill làm gì |
 | --- | --- |
-| `scripts/bow-commit.sh` | chạy nó làm cổng chặn (safety scan + analyzer + checklist) |
+| script cổng `scripts/*-commit.sh` đã commit ở gốc repo (tên do repo đặt: `bow-commit.sh`, `octopus-commit.sh`…) | mở ra xem nó chỉ KIỂM (không tự `git add` / `commit` / `push`) rồi chạy từ gốc repo làm cổng chặn (safety scan + analyzer + checklist) |
 | không có script | tự soát diff đã stage (secret, CORS wildcard, đồ debug sót) rồi chạy check của chính repo: `flutter analyze` / `typecheck` · `lint` · `test` của `package.json` |
 | `scripts/quest-checklist.sh` | bắt buộc tự chấm rubric trước khi push |
 | quy ước commit riêng (CLAUDE.md / CONTRIBUTING) | theo quy ước của repo; ba luật cứng vẫn giữ |
@@ -49,7 +49,7 @@ của `~/.bow-agent/registry.json`, rồi thêm `with` vào stack nào cần:
 ```json
 {
   "addons": [
-    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.1.0" }
+    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.2.0" }
   ],
   "stacks": [
     { "id": "flutter-api", "label": "Flutter + API", "repo": "github.com/Bow-T/bow-skill-flutter-api", "ref": "v1.0.0", "with": ["commit"] }

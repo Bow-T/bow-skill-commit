@@ -1,6 +1,6 @@
 ---
 name: bow-commit
-description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (capitalised Type, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
+description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (capitalised Type, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "<project> commit" (e.g. "octopus commit"), "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
 ---
 
 # Bow Mode — Commit & Push
@@ -46,15 +46,25 @@ If the repo documents its own message format (CLAUDE.md, CONTRIBUTING.md,
   Confirm with the user before `git add -A`.
 
 ## 1. Project gate — BLOCKING
-- **If the repo has `scripts/bow-commit.sh`:**
-  ```bash
-  bash scripts/bow-commit.sh
-  ```
-  It bundles that repo's safety scan, branch-name check, analyzer and checklist preview
-  (in the Supabase monorepo: `scripts/check-quest.sh --staged` — RLS FK-ownership,
+The gate is the repo's own pre-commit script. Its name is the repo's choice
+(`scripts/bow-commit.sh`, `scripts/octopus-commit.sh`, …), so look for it instead of
+assuming the name. This lists it from the repo ROOT, whatever sub-directory you are in:
+```bash
+git ls-files --full-name ':(top,glob)scripts/*-commit.sh'
+```
+- **One match:** open the script before the first run. A gate only CHECKS — it bundles
+  that repo's safety scan, branch-name check, analyzer and checklist preview (in the
+  Supabase monorepo: `scripts/check-quest.sh --staged` — RLS FK-ownership,
   `security_invoker` views, CORS wildcards, secrets — + `fvm flutter analyze` +
-  `scripts/quest-checklist.sh`).
-- **No such script:** read the staged diff yourself (`git diff --cached`) for secrets
+  `scripts/quest-checklist.sh`). If it runs `git add` / `git commit` / `git push` itself
+  (`scripts/agent-commit-push.sh`), it is § 4's automated path, not the gate: treat the
+  repo as **No match**. Otherwise run it from the repo root (`git rev-parse --show-toplevel`):
+  ```bash
+  bash scripts/<name>-commit.sh
+  ```
+- **Several matches:** the one the repo's CLAUDE.md / CONTRIBUTING.md names as the commit
+  gate; still unsure → ask the user.
+- **No match:** read the staged diff yourself (`git diff --cached`) for secrets
   (API keys, tokens, private keys, service-role keys, `.env` values), wildcard CORS,
   and debug leftovers (stray prints, commented-out blocks, `TODO: remove`).
 > Non-zero exit or any hit → STOP, extract the finding (file:line), fix the code,
