@@ -53,7 +53,7 @@ của `~/.bow-agent/registry.json`, rồi thêm `with` vào stack nào cần:
 ```json
 {
   "addons": [
-    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.2.0" }
+    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.2.1" }
   ],
   "stacks": [
     { "id": "flutter-api", "label": "Flutter + API", "repo": "github.com/Bow-T/bow-skill-flutter-api", "ref": "v1.0.0", "with": ["commit"] }

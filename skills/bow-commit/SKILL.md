@@ -59,7 +59,7 @@ git ls-files --full-name ':(top,glob)scripts/*-commit.sh'
   Supabase monorepo: `scripts/check-quest.sh --staged` — RLS FK-ownership,
   `security_invoker` views, CORS wildcards, secrets — + `fvm flutter analyze` +
   `scripts/quest-checklist.sh`). If it runs `git add` / `git commit` / `git push` itself
-  (`scripts/agent-commit-push.sh`), it is § 4's automated path, not the gate: treat the
+  (`scripts/agent-commit-push.sh`), it is § 5's automated path, not the gate: treat the
   repo as **No match**. Otherwise run it from the repo root (`git rev-parse --show-toplevel`):
   ```bash
   bash scripts/<name>-commit.sh
@@ -120,17 +120,7 @@ Rules — get these exact:
 - Intent override (when the change is mainly this): l10n/i18n 🌐 · security/RLS/secrets 🔒️ · DB schema / migration 🗃️ · remove dead code/files 🔥 · upgrade deps ⬆️ · CI pipeline 👷 · config files 🔧 · critical hotfix 🚑️ · UI/cosmetic only 💄
 > Type says "what kind of commit"; emoji says "what it touched". A `Fix` that localizes copy → `Fix(...): 🌐 …` (intent beats the 🐛 default).
 
-## 4. Commit & push
-Write the message to a temp file then commit (avoids shell-escaping issues):
-```bash
-git commit -F <tempfile>
-git push -u origin "$(git rev-parse --abbrev-ref HEAD)"
-```
-*If the repo has* `scripts/agent-commit-push.sh` (stage → ticket-parse → commit → push
-in one go), use it only when the user wants the fully-automated path; prefer the explicit
-steps above when you need control over staging or the message.
-
-## 4b. Self-verify the quest checklist — *if the repo has `scripts/quest-checklist.sh`*
+## 4. Self-verify the quest checklist — *if the repo has `scripts/quest-checklist.sh`*
 MANDATORY in those repos — do NOT defer it to the user. § 1 already printed the checklist
 preview; READ it, then fill in the "Pre-commit preview" rubric from `.claude/CLAUDE.md`
 yourself. For **every** row:
@@ -143,9 +133,19 @@ yourself. For **every** row:
 Emit the full rubric (AI-review block + Process levers + `Score` + `Verdict`). Honest
 self-score **< 80% → STOP, do not commit**: fix the code (add the missing check, split a
 `Test:` commit, delete dead code…), re-stage, re-run, re-score. Only `Verdict: READY`
-proceeds to push.
+proceeds to § 5.
 
-## 5. Report
+## 5. Commit & push
+Write the message to a temp file then commit (avoids shell-escaping issues):
+```bash
+git commit -F <tempfile>
+git push -u origin "$(git rev-parse --abbrev-ref HEAD)"
+```
+*If the repo has* `scripts/agent-commit-push.sh` (stage → ticket-parse → commit → push
+in one go), use it only when the user wants the fully-automated path; prefer the explicit
+steps above when you need control over staging or the message.
+
+## 6. Report
 Summarise: branch, commit hash + subject, files/insertions/deletions, push result, and
-the MR/PR-create URL printed by the push (plus the § 4b rubric where it applies). One
+the MR/PR-create URL printed by the push (plus the § 4 rubric where it applies). One
 branch = one MR/PR; do NOT self-merge — review goes to a teammate.
