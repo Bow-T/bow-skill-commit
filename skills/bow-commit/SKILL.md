@@ -1,6 +1,6 @@
 ---
 name: bow-commit
-description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (capitalised Type, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "<PROJECT_KEY> commit" (the repo's Jira key, e.g. "ABC commit"), "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
+description: Commit and push the Bow way on ANY stack — work on a `<type>/<PROJECT_KEY>-<num>-<slug>` branch (never straight on main/develop), run the repo's own gate and static checks first, then a strict Conventional-Commit message (lower-case type, Jira key in the subject, gitmoji, WHY body, `Refs:` footer) with NO AI-authorship trailer, then push. Use when the user says "bow commit", "<PROJECT_KEY> commit" (the repo's Jira key, e.g. "ABC commit"), "commit + push", "push + commit", "đẩy code chuẩn bow", or asks to commit, push, or name a branch on this repo.
 ---
 
 # Bow Mode — Commit & Push
@@ -12,14 +12,14 @@ Steps marked *if the repo has it* are skipped when the file is not there — nev
 a script or a command the repo does not ship.
 
 `<PROJECT_KEY>` is the repo's Jira project key (`ABC` in `ABC-123`). The key is what
-identifies the project here — branch names, the `Refs:` footer and your report all go by
+identifies the project here — branch names, the commit subject, the `Refs:` footer and your report all go by
 it, never by a product or repo name. Take it from the current branch name, else from
 recent history (the most frequent prefix is the key), else ask the user:
 ```bash
 git log -20 --format='%s %b' | grep -oE '\b[A-Z][A-Z0-9]+-[0-9]+' | cut -d- -f1 | sort | uniq -c | sort -rn | head -3
 ```
 A repo with no Jira project at all: confirm with the user once, then drop the ticket
-segment from the branch name and the `Refs:` footer — everything else still applies.
+segment from the branch name, the subject and the `Refs:` footer — everything else still applies.
 
 ## Hard rules — every repo, no exceptions
 
@@ -39,9 +39,9 @@ If the repo documents its own message format (CLAUDE.md, CONTRIBUTING.md,
 ## 0. Pre-flight
 - `git status` and `git rev-parse --abbrev-ref HEAD` to see changes + branch.
 - On a default branch → create one first: `<type>/<PROJECT_KEY>-<num>-<slug>`
-  (type ∈ feat|fix|refactor|perf|test|docs|chore|style; slug = short kebab-case).
+  (type ∈ feat|fix|refactor|perf|test|docs|chore|style|ci|build|revert; slug = short kebab-case).
 - Parse the Jira ticket from the branch name (`fix/<PROJECT_KEY>-800-…` → `<PROJECT_KEY>-800`).
-  No ticket in the branch → ask the user for one (the footer needs `Refs: <PROJECT_KEY>-XXX`).
+  No ticket in the branch → ask the user for one (the subject and the `Refs:` footer both need it).
 - Stage intended files with `git add <paths>` — scope to what this change touched
   (in a monorepo, the app dir: `git add apps/mobile`). NEVER stage local config or
   secrets: `.claude/settings.local.json`, `.env*`, key/credential files, scratch dirs.
@@ -86,7 +86,7 @@ in the staged diff, from that package's directory:
 
 ## 3. Compose the commit message (strict Conventional Commits)
 ```text
-Type(scope): <emoji> Subject matching the Jira task title or a short clear summary
+type(scope): <PROJECT_KEY>-XXX <emoji> imperative summary of the Jira task
 
 Detailed explanation of WHY these changes were made — at least 3 lines
 describing the engineering decisions and the structural / behaviour changes,
@@ -94,31 +94,41 @@ not a restatement of the diff.
 
 Refs: <PROJECT_KEY>-XXX
 ```
-Rules — get these exact:
-- **Type**: capitalised (`Feat`, `Fix`, `Refactor`, `Perf`, `Test`, `Docs`, `Chore`, `Style`).
-- **Gitmoji**: one icon **right after the colon**, never before `Type` (tooling matches
-  `^(Feat|Fix|…)` at the start of the subject). Pick by the change's intent (map below),
-  e.g. `Fix(notifications): 🌐 Localize push templates per recipient locale`.
-- **Subject**: 10–72 chars *including the emoji*, imperative verb (`add`/`fix`/`update`,
-  not `adding`/`fixed`).
+e.g. `fix(ios): ABC-239 🐛 keep the crop toolbar above the home indicator`.
+
+Rules — get these exact (the company MR review checks them as PROC-004 and blocks the
+merge on a miss; the company `commit-msg` hook, `@du/commitlint-config`, enforces the
+same type / scope / length rules where a repo installs it):
+- **Type**: lower-case only — `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`,
+  `style`, `ci`, `build`, `revert` (the branch-prefix set). `Fix` / `Docs` / `Test` fail.
+- **Scope**: optional, kebab-case (`crop-toolbar`, not `cropToolbar`).
+- **Ticket in the subject**: `<PROJECT_KEY>-<num>` straight after `type(scope): `,
+  before anything else. A ticket that only appears in `Refs:` does not count.
+- **Gitmoji**: one icon right after the ticket — never before `type`, never between
+  `: ` and the ticket. Pick by the change's intent (map below).
+- **Summary**: starts with a lower-case imperative verb (`add`/`fix`/`keep`, not
+  `Adding`/`fixed`), matching the Jira task title or a short clear summary; no full stop.
+- **Length**: the whole first line — type, scope, ticket and emoji included — is
+  10–72 chars. The ticket takes ~10 of them: shorten the summary rather than run over.
 - **Body**: ≥ 3 lines, explain WHY (not just what).
-- **Footer**: `Refs: <PROJECT_KEY>-<num>` — the SPECIFIC ticket THIS commit implements,
-  not just the branch's umbrella ticket. Nothing after it (Hard rule 1).
+- **Footer**: `Refs: <PROJECT_KEY>-<num>` — the same ticket as the subject: the SPECIFIC
+  one THIS commit implements, not just the branch's umbrella ticket. Nothing after it
+  (Hard rule 1).
 - **No duplicate refs on a branch.** List the refs already used and avoid reusing one
   unless this commit is genuinely the same unit of work (`<base>` = the branch you
   will merge into, e.g. `origin/develop` or `origin/main`):
   ```bash
-  git log --format='%b' <base>..HEAD | grep -oE '<PROJECT_KEY>-[0-9]+' | sort -u
+  git log --format='%B' <base>..HEAD | grep -oE '<PROJECT_KEY>-[0-9]+' | sort -u
   ```
-  A branch that touches several tickets should spread **distinct** `Refs:` across its
+  A branch that touches several tickets should spread **distinct** tickets across its
   commits — one ticket per commit where the work cleanly maps. If the only honest ticket
   is one already used, prefer **amending** the prior commit (when unpushed) over a second
   commit with the duplicate ref.
 
 **Gitmoji map** (https://gitmoji.dev) — *intent wins over the type default*:
-- Type default: `Feat` ✨ · `Fix` 🐛 · `Refactor` ♻️ · `Perf` ⚡️ · `Test` ✅ · `Docs` 📝 · `Chore` 🔧 · `Style` 🎨 · `Revert` ⏪️
+- Type default: `feat` ✨ · `fix` 🐛 · `refactor` ♻️ · `perf` ⚡️ · `test` ✅ · `docs` 📝 · `chore` 🔧 · `style` 🎨 · `ci` 👷 · `build` 📦️ · `revert` ⏪️
 - Intent override (when the change is mainly this): l10n/i18n 🌐 · security/RLS/secrets 🔒️ · DB schema / migration 🗃️ · remove dead code/files 🔥 · upgrade deps ⬆️ · CI pipeline 👷 · config files 🔧 · critical hotfix 🚑️ · UI/cosmetic only 💄
-> Type says "what kind of commit"; emoji says "what it touched". A `Fix` that localizes copy → `Fix(...): 🌐 …` (intent beats the 🐛 default).
+> Type says "what kind of commit"; emoji says "what it touched". A `fix` that localizes copy → `fix(...): ABC-1 🌐 …` (intent beats the 🐛 default).
 
 ## 4. Self-verify the quest checklist — *if the repo has `scripts/quest-checklist.sh`*
 MANDATORY in those repos — do NOT defer it to the user. § 1 already printed the checklist
@@ -132,7 +142,7 @@ yourself. For **every** row:
 
 Emit the full rubric (AI-review block + Process levers + `Score` + `Verdict`). Honest
 self-score **< 80% → STOP, do not commit**: fix the code (add the missing check, split a
-`Test:` commit, delete dead code…), re-stage, re-run, re-score. Only `Verdict: READY`
+`test(scope):` commit, delete dead code…), re-stage, re-run, re-score. Only `Verdict: READY`
 proceeds to § 5.
 
 ## 5. Commit & push

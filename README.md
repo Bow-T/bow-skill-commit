@@ -32,7 +32,8 @@ Phần còn lại tự thích nghi theo repo:
 | `scripts/quest-checklist.sh` | bắt buộc tự chấm rubric trước khi push |
 | quy ước commit riêng (CLAUDE.md / CONTRIBUTING) | theo quy ước của repo; ba luật cứng vẫn giữ |
 
-Khuôn message mặc định: `Type(scope): <gitmoji> Subject` · body ≥ 3 dòng giải thích VÌ SAO ·
+Khuôn message mặc định: `type(scope): <MÃ-JIRA>-<số> <gitmoji> tóm tắt` (type viết THƯỜNG, mã ticket ngay
+sau dấu hai chấm — review MR của công ty chặn merge nếu sai, mã PROC-004) · body ≥ 3 dòng giải thích VÌ SAO ·
 footer `Refs: <MÃ-JIRA>-<số>`.
 
 **Dự án được nhận bằng MÃ JIRA** (`ABC` trong `ABC-123`), không bằng tên sản phẩm hay tên repo: skill
@@ -53,7 +54,7 @@ của `~/.bow-agent/registry.json`, rồi thêm `with` vào stack nào cần:
 ```json
 {
   "addons": [
-    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.2.1" }
+    { "id": "commit", "label": "Commit chuẩn Bow", "repo": "github.com/Bow-T/bow-skill-commit", "ref": "v1.3.0" }
   ],
   "stacks": [
     { "id": "flutter-api", "label": "Flutter + API", "repo": "github.com/Bow-T/bow-skill-flutter-api", "ref": "v1.0.0", "with": ["commit"] }
